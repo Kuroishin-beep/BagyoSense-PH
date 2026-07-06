@@ -13,6 +13,7 @@ export interface DataRow {
   prevMonth: number;
   ensoPhase: 'El Nino' | 'La Nina' | 'Neutral';
   season: 'Peak' | 'Off-Season';
+  predicted: boolean;
 }
 
 export interface ModelMetrics {

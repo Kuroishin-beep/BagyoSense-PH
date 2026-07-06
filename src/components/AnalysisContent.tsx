@@ -9,8 +9,9 @@ import { DataRow } from '@/lib/types';
 import { loadData, CHART, ENSO_FILL, MONTH_LABELS, YEAR_COLORS } from '@/lib/data';
 
 export default function AnalysisContent() {
-  const [data, setData] = useState<DataRow[]>([]);
-  useEffect(() => { loadData().then(setData); }, []);
+  const [raw, setRaw] = useState<DataRow[]>([]);
+  useEffect(() => { loadData().then(setRaw); }, []);
+  const data = useMemo(() => raw.filter(d => !d.predicted), [raw]);
 
   // Rolling averages
   const rolling = useMemo(() => {

@@ -1,51 +1,33 @@
 {
   "XGBoost": {
-    "cv_r2": 0.2252,
-    "test_r2": 0.428,
-    "rmse": 1.291,
-    "mae": 0.9259,
-    "best_params": {
-      "colsample_bytree": 1.0,
-      "learning_rate": 0.05,
-      "max_depth": 3,
-      "n_estimators": 100,
-      "subsample": 0.8
-    },
+    "cv_r2": -0.2362,
+    "test_r2": 0.9284,
+    "rmse": 0.4288,
+    "mae": 0.3405,
     "uses_scaler": false
   },
   "Random Forest": {
-    "cv_r2": 0.1605,
-    "test_r2": 0.25,
-    "rmse": 1.4782,
-    "mae": 1.0741,
-    "best_params": {
-      "max_depth": 4,
-      "min_samples_split": 2,
-      "n_estimators": 200
-    },
+    "cv_r2": -0.0401,
+    "test_r2": 0.697,
+    "rmse": 0.882,
+    "mae": 0.702,
     "uses_scaler": false
   },
   "Gradient Boosting": {
-    "cv_r2": 0.1229,
-    "test_r2": 0.1483,
-    "rmse": 1.5753,
-    "mae": 1.1481,
-    "best_params": {
-      "learning_rate": 0.05,
-      "max_depth": 3,
-      "n_estimators": 100
-    },
+    "cv_r2": -0.2525,
+    "test_r2": 0.9532,
+    "rmse": 0.3467,
+    "mae": 0.2792,
     "uses_scaler": false
   },
   "Linear Regression": {
-    "cv_r2": 0.1757,
-    "test_r2": 0.3008,
-    "rmse": 1.4272,
-    "mae": 1.0,
-    "best_params": {},
+    "cv_r2": 0.0234,
+    "test_r2": 0.4393,
+    "rmse": 1.1999,
+    "mae": 0.9409,
     "uses_scaler": true
   },
-  "_best_model": "XGBoost",
+  "_best_model": "Linear Regression",
   "_features": [
     "Month",
     "ONI",
