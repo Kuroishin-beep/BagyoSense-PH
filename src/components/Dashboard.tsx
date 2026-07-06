@@ -112,19 +112,19 @@ export default function Dashboard() {
     <>
       <div className="page-header">
         <div className="page-title">Dashboard</div>
-        <div className="page-sub">Typhoon intelligence 2014-2025 + 2026 forecast</div>
+        <div className="page-sub">Typhoon intelligence (Actuals + 12-Month Forecast)</div>
       </div>
 
       <div className="kpi-grid">
         <KPICard value={kpis!.total} label="Total Typhoons (actual)" />
         <KPICard value={kpis!.avg} label="Avg Per Year" />
-        <KPICard value={kpis!.pred2026} label="2026 Forecast" variant="amber" />
+        <KPICard value={kpis!.pred2026} label="12-Month Forecast" variant="amber" />
         <KPICard value={kpis!.worstYear} label="Most Active Year" variant="red" />
       </div>
 
       {/* Annual Trend */}
       <div className="chart-card" style={{ marginBottom: '0.75rem' }}>
-        <div className="chart-title">Annual typhoon count (2026 = forecast)</div>
+        <div className="chart-title">Annual typhoon count</div>
         <ResponsiveContainer width="100%" height={240}>
           <ComposedChart data={annual}>
             <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" vertical={false} />
@@ -132,7 +132,7 @@ export default function Dashboard() {
             <YAxis tick={{ fill: CHART.tick, fontSize: 11 }} />
             <Tooltip {...CHART.tooltip} />
             <Bar dataKey="actual" fill={CHART.primary} radius={[3, 3, 0, 0]} name="Actual" stackId="a" />
-            <Bar dataKey="forecast" fill={CHART.amber} radius={[3, 3, 0, 0]} name="2026 Forecast" stackId="a" opacity={0.7} />
+            <Bar dataKey="forecast" fill={CHART.amber} radius={[3, 3, 0, 0]} name="Forecast" stackId="a" opacity={0.7} />
             <Line dataKey="trend" stroke="#64748b" strokeDasharray="4 4" strokeWidth={1.5} dot={false} name="Trend" />
           </ComposedChart>
         </ResponsiveContainer>
