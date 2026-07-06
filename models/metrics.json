@@ -1,0 +1,61 @@
+{
+  "XGBoost": {
+    "cv_r2": 0.2252,
+    "test_r2": 0.428,
+    "rmse": 1.291,
+    "mae": 0.9259,
+    "best_params": {
+      "colsample_bytree": 1.0,
+      "learning_rate": 0.05,
+      "max_depth": 3,
+      "n_estimators": 100,
+      "subsample": 0.8
+    },
+    "uses_scaler": false
+  },
+  "Random Forest": {
+    "cv_r2": 0.1605,
+    "test_r2": 0.25,
+    "rmse": 1.4782,
+    "mae": 1.0741,
+    "best_params": {
+      "max_depth": 4,
+      "min_samples_split": 2,
+      "n_estimators": 200
+    },
+    "uses_scaler": false
+  },
+  "Gradient Boosting": {
+    "cv_r2": 0.1229,
+    "test_r2": 0.1483,
+    "rmse": 1.5753,
+    "mae": 1.1481,
+    "best_params": {
+      "learning_rate": 0.05,
+      "max_depth": 3,
+      "n_estimators": 100
+    },
+    "uses_scaler": false
+  },
+  "Linear Regression": {
+    "cv_r2": 0.1757,
+    "test_r2": 0.3008,
+    "rmse": 1.4272,
+    "mae": 1.0,
+    "best_params": {},
+    "uses_scaler": true
+  },
+  "_best_model": "XGBoost",
+  "_features": [
+    "Month",
+    "ONI",
+    "Nino3.4_SST_anomaly",
+    "Western_Pacific_SST",
+    "Vertical_Wind_Shear",
+    "Midlevel_Humidity",
+    "SeaLevelPressure",
+    "MJO_Phase",
+    "Prev_month_typhoons"
+  ],
+  "_target": "Number_of_Typhoons"
+}
