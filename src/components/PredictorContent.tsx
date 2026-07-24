@@ -4,111 +4,149 @@ import { useEffect, useState, useMemo } from 'react';
 import { ModelData } from '@/lib/types';
 import { loadModel, predict } from '@/lib/predict';
 import { MONTH_FULL } from '@/lib/data';
+import { FEATURES, formatFeature, ensoFromOni, ENSO_INFO } from '@/lib/features';
+import InfoDot from './InfoDot';
+import Disclaimer from './Disclaimer';
 
-const SLIDERS = [
-  { key: 'month',     label: 'Month',           min: 1,     max: 12,     step: 1,    init: 8    },
-  { key: 'oni',       label: 'ONI Index',        min: -2.5,  max: 2.5,    step: 0.05, init: 0    },
-  { key: 'nino34',    label: 'Nino 3.4 SST',     min: -2.5,  max: 2.5,    step: 0.05, init: 0    },
-  { key: 'wPacSST',   label: 'W. Pacific SST',   min: -1.5,  max: 1.5,    step: 0.05, init: 0    },
-  { key: 'windShear', label: 'Wind Shear',       min: 5,     max: 16,     step: 0.1,  init: 8    },
-  { key: 'humidity',  label: 'Humidity %',       min: 45,    max: 80,     step: 0.5,  init: 68   },
-  { key: 'slp',       label: 'Sea Level Pressure', min: 1002, max: 1013,  step: 0.1,  init: 1005 },
-  { key: 'mjoPhase',  label: 'MJO Phase',        min: 0,     max: 8,      step: 1,    init: 4    },
-  { key: 'prevMonth', label: 'Prev Month Count', min: 0,     max: 8,      step: 1,    init: 1    },
-] as const;
+type Values = Record<string, number>;
+
+const DEFAULTS: Values = Object.fromEntries(FEATURES.map(f => [f.key, f.init]));
+
+/** Representative climate settings for one-tap scenarios (peak season, August). */
+const PRESETS: { label: string; icon: string; values: Values }[] = [
+  { label: 'La Niña (stormy)', icon: '🌊', values: {
+      month: 8, oni: -1.2, nino34: -1.2, wPacSST: 0.5, windShear: 7.5,
+      humidity: 71, slp: 1004.5, mjoPhase: 5, prevMonth: 3 } },
+  { label: 'Neutral', icon: '⚖️', values: {
+      month: 8, oni: 0, nino34: 0, wPacSST: 0.1, windShear: 9,
+      humidity: 66, slp: 1006, mjoPhase: 4, prevMonth: 2 } },
+  { label: 'El Niño (calm)', icon: '☀️', values: {
+      month: 8, oni: 1.2, nino34: 1.2, wPacSST: -0.2, windShear: 11,
+      humidity: 60, slp: 1008, mjoPhase: 3, prevMonth: 1 } },
+];
 
 export default function PredictorContent() {
   const [model, setModel] = useState<ModelData | null>(null);
-  const [values, setValues] = useState<Record<string, number>>(
-    Object.fromEntries(SLIDERS.map(s => [s.key, s.init]))
-  );
-
+  const [values, setValues] = useState<Values>(DEFAULTS);
   useEffect(() => { loadModel().then(setModel); }, []);
 
-  const features = useMemo(() => {
-    return SLIDERS.map(s => values[s.key]);
-  }, [values]);
+  const features = useMemo(() => FEATURES.map(f => values[f.key]), [values]);
+  const prediction = useMemo(() => (model ? predict(model, features) : null), [model, features]);
 
-  const prediction = useMemo(() => {
-    if (!model) return null;
-    return predict(model, features);
-  }, [model, features]);
+  const enso = ensoFromOni(values.oni);
+  const risk = prediction === null ? '' : prediction >= 4 ? 'alert' : prediction >= 2 ? 'warn' : 'low';
+  const riskLabel = prediction === null ? '' : prediction >= 4 ? 'High activity' : prediction >= 2 ? 'Moderate activity' : 'Quiet';
 
-  const ensoLabel = values.oni >= 0.5 ? 'El Nino' : values.oni <= -0.5 ? 'La Nina' : 'Neutral';
-  const risk = prediction !== null
-    ? prediction >= 4 ? 'alert' : prediction >= 2 ? 'warn' : ''
-    : '';
-  const riskLabel = prediction !== null
-    ? prediction >= 4 ? 'High risk' : prediction >= 2 ? 'Moderate' : 'Low activity'
-    : '';
+  const predictorName = model?.predictorModel ?? 'Linear model';
+  const predRmse = model?.metrics?.[predictorName]?.rmse ?? null;
 
-  const handleChange = (key: string, val: number) => {
-    setValues(prev => ({ ...prev, [key]: val }));
-  };
+  const set = (key: string, val: number) => setValues(prev => ({ ...prev, [key]: val }));
 
-  if (!model) return <div className="loading">Loading model...</div>;
+  if (!model) return <div className="loading">Loading model…</div>;
 
   return (
     <>
       <div className="page-header">
-        <div className="page-title">Predictor</div>
-        <div className="page-sub">Interactive typhoon forecast</div>
+        <div className="page-title">Try the predictor</div>
+        <div className="page-sub">Move the sliders to a weather scenario and see how many typhoons the model expects that month.</div>
       </div>
 
-      {/* Model metrics */}
-      <div className="section-label">Trained model performance</div>
-      <div className="metrics-grid">
-        {Object.entries(model.metrics).map(([name, m]) => (
-          <div key={name} className={`model-card ${name === model.bestModel ? 'best' : ''}`}>
-            <div className="model-name">
-              {name === model.bestModel ? `${name} (best)` : name}
+      <Disclaimer dataThrough={model.dataThrough} />
+
+      {/* One-tap scenarios */}
+      <div className="section-label">Start from a scenario</div>
+      <div className="preset-row">
+        {PRESETS.map(p => (
+          <button key={p.label} className="preset-btn" onClick={() => setValues({ ...DEFAULTS, ...p.values })}>
+            {p.icon} {p.label}
+          </button>
+        ))}
+        <button className="preset-btn reset" onClick={() => setValues(DEFAULTS)}>↺ Reset</button>
+      </div>
+
+      {/* Sliders */}
+      <div className="section-label">Adjust the conditions</div>
+      <div className="slider-grid">
+        {FEATURES.map(f => (
+          <div key={f.key} className="slider-group">
+            <div className="slider-top">
+              <span className="slider-name">
+                {f.label}
+                <InfoDot title={f.technical}>{f.what} {f.meaning}</InfoDot>
+              </span>
+              <span className="slider-val">
+                {f.key === 'month' ? MONTH_FULL[values.month - 1] : formatFeature(f.key, values[f.key])}
+              </span>
             </div>
-            <div>
-              {m.testR2 != null && <span className="chip">R2 {m.testR2.toFixed(3)}</span>}
-              {m.rmse != null && <span className="chip">RMSE {m.rmse.toFixed(2)}</span>}
-              {m.mae != null && <span className="chip">MAE {m.mae.toFixed(2)}</span>}
-            </div>
+            <input
+              type="range" min={f.min} max={f.max} step={f.step}
+              value={values[f.key]}
+              onChange={e => set(f.key, parseFloat(e.target.value))}
+            />
+            <span className="slider-hint">{f.meaning}</span>
           </div>
         ))}
+      </div>
+
+      {/* Result */}
+      <div className={`prediction-box ${risk}`}>
+        <div className="prediction-main">
+          <div className="prediction-value">{prediction}</div>
+          <div className="prediction-label">typhoons expected</div>
+        </div>
+        <div className="prediction-read">
+          <div className="prediction-headline">
+            In {MONTH_FULL[values.month - 1]}, under {ENSO_INFO[enso].title} conditions
+          </div>
+          <div className="prediction-context">
+            The model expects about <b>{prediction}</b> typhoon{prediction === 1 ? '' : 's'}
+            {predRmse ? <> — give or take roughly {predRmse.toFixed(1)}</> : null}.
+            {' '}{ENSO_INFO[enso].blurb}
+          </div>
+          <span className={`risk-pill ${risk}`}>{riskLabel}</span>
+        </div>
       </div>
 
       <hr className="section-divider" />
 
-      {/* Sliders */}
-      <div className="section-label">Input parameters</div>
-      <div className="slider-grid">
-        {SLIDERS.map(s => (
-          <div key={s.key} className="slider-group">
-            <label>
-              {s.label}
-              <span>{values[s.key]}</span>
-            </label>
-            <input
-              type="range"
-              min={s.min}
-              max={s.max}
-              step={s.step}
-              value={values[s.key]}
-              onChange={e => handleChange(s.key, parseFloat(e.target.value))}
-            />
-          </div>
-        ))}
+      {/* Honest accuracy */}
+      <div className="section-label">
+        How accurate is this?
+        <InfoDot title="Read this first">
+          Scores are cross-validated on months the model never trained on, then
+          checked on the most recent {model.holdoutMonths ?? 18} months.
+        </InfoDot>
+      </div>
+      <div className="callout">
+        Monthly typhoon counts are genuinely hard to predict. These models land
+        <b> within about ±1 typhoon</b> of the real count, and only edge out a plain
+        {model.baseline ? <> &ldquo;{model.baseline.name.toLowerCase()}&rdquo;</> : ' seasonal average'} baseline.
+        Use this to explore how conditions relate to storms — not as a real forecast.
       </div>
 
-      {/* Prediction */}
-      <div className={`prediction-box ${risk}`}>
-        <div>
-          <div className="prediction-value">{prediction}</div>
-          <div className="prediction-label">Typhoons expected</div>
-        </div>
-        <div>
-          <div className="prediction-context">
-            {MONTH_FULL[values.month - 1]} &middot; {ensoLabel} &middot; {riskLabel}
+      <div className="metrics-grid">
+        {Object.entries(model.metrics).map(([name, m]) => (
+          <div key={name} className={`model-card ${name === model.bestModel ? 'best' : ''}`}>
+            <div className="model-name">
+              {name}
+              {name === model.bestModel && <span className="best-tag">best</span>}
+              {name === model.predictorModel && name !== model.bestModel && <span className="best-tag">used here</span>}
+            </div>
+            {m.rmse != null && (
+              <div className="metric-row"><span>Typical miss</span><span>±{m.rmse.toFixed(1)}</span></div>
+            )}
+            {m.cvR2 != null && (
+              <div className="metric-row"><span>Skill (↑ better)</span><span>{m.cvR2.toFixed(2)}</span></div>
+            )}
           </div>
-          <div style={{ marginTop: '0.4rem' }}>
-            <span className="chip">Linear Regression</span>
+        ))}
+        {model.baseline && (
+          <div className="model-card">
+            <div className="model-name">{model.baseline.name}<span className="chip" style={{ marginLeft: 'auto' }}>baseline</span></div>
+            <div className="metric-row"><span>Typical miss</span><span>±{model.baseline.rmse.toFixed(1)}</span></div>
+            <div className="metric-row"><span>What it is</span><span>no ML</span></div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );

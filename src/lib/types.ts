@@ -18,9 +18,23 @@ export interface DataRow {
 
 export interface ModelMetrics {
   cvR2: number | null;
+  cvRmse?: number | null;
   testR2: number | null;
   rmse: number | null;
   mae: number | null;
+}
+
+export interface Baseline {
+  name: string;
+  r2: number;
+  rmse: number;
+  mae: number;
+}
+
+export interface FeatureImportance {
+  feature: string;
+  importance: number;
+  direction: 'up' | 'down';
 }
 
 export interface ModelData {
@@ -29,5 +43,12 @@ export interface ModelData {
   coefficients: number[];
   intercept: number;
   metrics: Record<string, ModelMetrics>;
+  baseline?: Baseline;
+  featureImportance?: FeatureImportance[];
   bestModel: string;
+  predictorModel?: string;
+  dataThrough?: string;
+  holdoutMonths?: number;
+  illustrative?: boolean;
+  note?: string;
 }

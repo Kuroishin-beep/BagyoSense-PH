@@ -35,42 +35,104 @@
     ]
   },
   "coefficients": [
-    0.120849,
-    -0.972873,
-    0.978828,
-    -0.00725,
-    -0.414033,
-    -0.155652,
-    -0.397387,
-    0.10074,
-    0.541825
+    0.13178,
+    -0.2198,
+    0.225902,
+    -0.008216,
+    -0.405099,
+    -0.156485,
+    -0.399804,
+    0.099302,
+    0.538075
   ],
   "intercept": 1.446667,
   "metrics": {
-    "XGBoost": {
-      "cvR2": -0.1355,
-      "testR2": 0.85,
-      "rmse": 0.6092,
-      "mae": 0.5007
+    "Linear Regression": {
+      "cvR2": 0.1009,
+      "cvRmse": 1.4544,
+      "testR2": 0.6522,
+      "rmse": 0.9428,
+      "mae": 0.6667
+    },
+    "Ridge": {
+      "cvR2": 0.1327,
+      "cvRmse": 1.4247,
+      "testR2": 0.6522,
+      "rmse": 0.9428,
+      "mae": 0.6667
     },
     "Random Forest": {
-      "cvR2": 0.0371,
-      "testR2": 0.6779,
-      "rmse": 0.8926,
-      "mae": 0.7141
+      "cvR2": 0.1592,
+      "cvRmse": 1.4104,
+      "testR2": 0.4565,
+      "rmse": 1.1785,
+      "mae": 0.8333
     },
     "Gradient Boosting": {
-      "cvR2": -0.1885,
-      "testR2": 0.9536,
-      "rmse": 0.3387,
-      "mae": 0.2828
-    },
-    "Linear Regression": {
-      "cvR2": 0.1182,
-      "testR2": 0.4393,
-      "rmse": 1.1777,
-      "mae": 0.9164
+      "cvR2": -0.0929,
+      "cvRmse": 1.5459,
+      "testR2": 0.3913,
+      "rmse": 1.2472,
+      "mae": 0.8889
     }
   },
-  "bestModel": "Linear Regression"
+  "baseline": {
+    "name": "Seasonal average",
+    "r2": 0.4348,
+    "rmse": 1.2019,
+    "mae": 0.8889
+  },
+  "featureImportance": [
+    {
+      "feature": "windShear",
+      "importance": 0.3208,
+      "direction": "down"
+    },
+    {
+      "feature": "month",
+      "importance": 0.1949,
+      "direction": "up"
+    },
+    {
+      "feature": "slp",
+      "importance": 0.1131,
+      "direction": "down"
+    },
+    {
+      "feature": "prevMonth",
+      "importance": 0.1022,
+      "direction": "up"
+    },
+    {
+      "feature": "nino34",
+      "importance": 0.0669,
+      "direction": "up"
+    },
+    {
+      "feature": "mjoPhase",
+      "importance": 0.0567,
+      "direction": "up"
+    },
+    {
+      "feature": "oni",
+      "importance": 0.0553,
+      "direction": "down"
+    },
+    {
+      "feature": "wPacSST",
+      "importance": 0.0456,
+      "direction": "down"
+    },
+    {
+      "feature": "humidity",
+      "importance": 0.0445,
+      "direction": "down"
+    }
+  ],
+  "bestModel": "Random Forest",
+  "predictorModel": "Ridge",
+  "dataThrough": "2026-06",
+  "holdoutMonths": 18,
+  "illustrative": true,
+  "note": "Trained on illustrative climate data for education/demo. Metrics are cross-validated on a chronological hold-out. Not an official PAGASA/NOAA forecast."
 }

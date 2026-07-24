@@ -3,8 +3,8 @@ import Sidebar from '@/components/Sidebar';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'BagyoSense — Philippines Typhoon Intelligence',
-  description: 'AI-powered typhoon analytics and ML predictions for the Philippines, 2014-2024.',
+  title: 'BagyoSense — Philippine typhoon patterns, explained simply',
+  description: 'An educational dashboard exploring how typhoons hit the Philippines and how a simple forecasting model works. Built on illustrative data — not an official forecast.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
