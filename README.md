@@ -1,109 +1,73 @@
 # BagyoSense
 
-> Philippines typhoon intelligence platform
-> Machine learning predictions · Climate analytics · 10-year data (2014–2024)
+> Philippine typhoon patterns, explained simply.
+> An educational dashboard: climate analytics + a small machine-learning model, in plain language.
 
 *Bagyo (Filipino) — typhoon*
 
----
-
-## Overview
-
-BagyoSense is a Next.js dashboard that combines climate analytics and machine learning to analyze typhoon patterns in the Philippines. It uses 132 monthly observations spanning 2014–2024, incorporating ENSO indices, sea surface temperatures, wind shear, humidity, and MJO phase data.
-
-Built with TypeScript and deployed on Vercel. All computation runs client-side — no backend required.
+> ⚠️ **Educational demo.** BagyoSense runs on *illustrative* climate data so you
+> can explore how typhoon seasons behave and how a forecasting model is built and
+> judged. It is **not** an official PAGASA or NOAA product and must not be used for
+> planning or safety decisions.
 
 ---
 
-## Features
+## What it does
 
-| Module | Description |
+BagyoSense is a Next.js dashboard that turns monthly typhoon data into something a
+non-expert can read. Every technical term (ONI, wind shear, MJO…) is given a plain
+label and a one-line explanation on hover, and the headline patterns are written out
+as short, human sentences.
+
+| Page | What you get |
 |---|---|
-| **Dashboard** | KPI cards, annual trend with trendline, ENSO breakdown, monthly averages, climate correlations |
-| **Analysis** | Rolling averages (3M/12M), cumulative curves by year, ENSO monthly patterns, year-over-year change |
-| **Predictor** | Interactive sliders for 9 climate parameters, real-time typhoon forecast using exported ML model |
+| **Dashboard** | Key numbers, auto-generated plain-language **insights**, typhoons-per-year with trend & forecast, seasonal averages, ocean-pattern breakdown, and "what goes with more/fewer typhoons". |
+| **Analysis** | Smoothed trends (3- & 12-month averages), season build-up by year (recent years highlighted, older ones muted), season shape by El Niño/La Niña, and year-over-year change. |
+| **Predictor** | One-tap climate scenarios, friendly sliders with explanations, a readable result ("about 2 typhoons, give or take ~1"), and an **honest** accuracy panel comparing models to a no-ML baseline. |
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 14, TypeScript, React |
+| Frontend | Next.js 14 (App Router), TypeScript, React |
 | Charts | Recharts |
-| Styling | Vanilla CSS (dark theme) |
-| ML Inference | Client-side (exported Linear Regression coefficients) |
-| Training | Python, scikit-learn, XGBoost (local only) |
+| Styling | Vanilla CSS, calm dark theme (CVD-checked palette) |
+| In-browser prediction | Exported linear-model coefficients (no backend) |
+| Training | Python · scikit-learn (`train_model.py`) |
 | Deployment | Vercel |
+
+All charts and the interactive predictor run **client-side** — there is no server or
+API. The Python script is only needed if you want to retrain and regenerate the JSON.
 
 ---
 
-## Project Structure
+## Project structure
 
 ```
 BagyoSense-PH/
 ├── public/
-│   ├── data.json                     # Dataset (exported from CSV)
-│   └── model.json                    # Model coefficients + metrics
+│   ├── data.json          # History + 12-month model forecast (generated)
+│   └── model.json         # Linear coefficients + honest metrics (generated)
 ├── src/
-│   ├── app/
-│   │   ├── layout.tsx                # Root layout + sidebar
-│   │   ├── page.tsx                  # Dashboard
-│   │   ├── globals.css               # Dark theme
-│   │   ├── analysis/page.tsx         # Analysis
-│   │   └── predictor/page.tsx        # Predictor
-│   ├── components/
-│   │   ├── Sidebar.tsx               # Navigation
-│   │   ├── KPICard.tsx               # Metric card
-│   │   ├── Dashboard.tsx             # Dashboard charts
-│   │   ├── AnalysisContent.tsx       # Analysis charts
-│   │   └── PredictorContent.tsx      # Sliders + prediction
+│   ├── app/               # Routes + global styles
+│   ├── components/        # Dashboard, Analysis, Predictor, Insights, InfoDot…
 │   └── lib/
-│       ├── types.ts                  # TypeScript types
-│       ├── data.ts                   # Data loading + helpers
-│       └── predict.ts                # Client-side inference
-├── scripts/
-│   └── export_data.py                # CSV + model → JSON export
-├── dataset/
-│   └── philippines_typhoon_monthly_2014_2024.csv
-├── models/                           # Trained models (local only)
-├── train_model.py                    # Model training script
-├── package.json
-├── tsconfig.json
-└── next.config.mjs
+│       ├── types.ts       # Shared types
+│       ├── data.ts        # Data loading, palette, aggregation helpers
+│       ├── features.ts    # Plain-language dictionary for the 9 climate inputs
+│       ├── insights.ts    # Auto-generated plain-language findings
+│       └── predict.ts     # Client-side linear inference
+├── dataset/               # Monthly CSVs (illustrative)
+├── models/                # Fitted estimators (local convenience, git-ignored ok)
+├── train_model.py         # Single honest train → evaluate → export pipeline
+└── package.json
 ```
 
 ---
 
-## Dataset
-
-**File:** `dataset/philippines_typhoon_monthly_2014_2024.csv`
-**Records:** 132 monthly rows (Jan 2014 – Dec 2024)
-
-| Column | Description |
-|---|---|
-| `Year` | Year (2014–2024) |
-| `Month` | Month (1–12) |
-| `Number_of_Typhoons` | Target variable |
-| `ONI` | Oceanic Nino Index |
-| `Nino3.4_SST_anomaly` | Nino 3.4 sea surface temperature anomaly |
-| `Western_Pacific_SST` | Western Pacific SST anomaly |
-| `Vertical_Wind_Shear` | Wind shear |
-| `Midlevel_Humidity` | Mid-level atmospheric humidity (%) |
-| `SeaLevelPressure` | Sea level pressure (hPa) |
-| `MJO_Phase` | Madden-Julian Oscillation phase (0–8) |
-| `Prev_month_typhoons` | Lagged typhoon count |
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- Python 3.8+ (only for model training)
-
-### Install and Run
+## Getting started
 
 ```bash
 npm install
@@ -112,62 +76,63 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Production Build
+Production build:
 
 ```bash
-npm run build
-npm start
+npm run build && npm start
 ```
 
 ---
 
-## ML Training (Optional)
+## Retraining (optional)
 
-The trained models are already exported to `public/model.json`. To retrain:
+The app ships with `public/data.json` and `public/model.json` already generated.
+To rebuild them from the dataset:
 
 ```bash
-# Install Python dependencies
-pip install pandas numpy scikit-learn xgboost joblib
-
-# Train models with 5-fold cross-validation
+pip install pandas numpy scikit-learn joblib
 python train_model.py
-
-# Export to JSON for the frontend
-python scripts/export_data.py
 ```
 
-### Trained Models
+`train_model.py` does everything in one honest pass:
 
-| Model | CV R² | Test R² | RMSE | MAE |
+1. Loads the most complete dataset CSV and sorts it by time.
+2. Reserves the most recent 18 months as an untouched hold-out.
+3. Selects models with **TimeSeriesSplit** cross-validation (no peeking at the future).
+4. Reports metrics on the hold-out — never on the rows it trained on.
+5. Compares every model against a plain **seasonal-average baseline**.
+6. Produces a 12-month forecast under a stated climate scenario (clearly flagged).
+7. Exports `public/data.json` and `public/model.json`.
+
+### Honest model performance
+
+Small monthly counts are genuinely hard to predict, and the metrics say so.
+Cross-validated skill is low; the linear models' edge over the seasonal baseline is
+real but modest. (Numbers below are from the shipped `model.json`.)
+
+| Model | CV skill (R²) | Hold-out R² | Typical miss (RMSE) | MAE |
 |---|---|---|---|---|
-| **XGBoost** | 0.2252 | 0.4280 | 1.2910 | 0.9259 |
-| Random Forest | 0.1605 | 0.2500 | 1.4782 | 1.0741 |
-| Gradient Boosting | 0.1229 | 0.1483 | 1.5753 | 1.1481 |
-| Linear Regression | 0.1757 | 0.3008 | 1.4272 | 1.0000 |
+| Random Forest *(best CV)* | 0.16 | 0.46 | ±1.2 | 0.83 |
+| Ridge *(used in predictor)* | 0.13 | 0.65 | ±0.9 | 0.67 |
+| Linear Regression | 0.10 | 0.65 | ±0.9 | 0.67 |
+| Gradient Boosting | −0.09 | 0.39 | ±1.2 | 0.89 |
+| *Seasonal average (baseline)* | — | 0.43 | ±1.2 | 0.89 |
 
-XGBoost is the best-performing model. Linear Regression coefficients are exported for client-side interactive prediction.
-
----
-
-## Deployment
-
-### Vercel
-
-1. Push to GitHub
-2. Import the repository on [vercel.com](https://vercel.com)
-3. Vercel auto-detects Next.js — deploy with defaults
-
-No environment variables or build configuration needed.
+The interactive predictor uses the best-performing **linear** model, because its
+coefficients can run directly in the browser.
 
 ---
 
-## Key Findings
+## Patterns in this dataset
 
-- Peak season is June–November, accounting for ~85% of annual typhoons
-- La Nina years correlate with higher typhoon frequency; El Nino suppresses activity
-- Vertical wind shear has the strongest negative correlation with typhoon count
-- July–October are the most active months on average
-- Previous month count is the strongest short-term positive predictor
+The in-app Insights panel derives these automatically; they describe *this* dataset,
+not the real world:
+
+- Roughly **82%** of typhoons fall in the June–November peak season.
+- **October** is the busiest month on average.
+- **Wind shear** has the strongest link to typhoon counts (more shear → fewer storms).
+- El Niño / La Niña shifts the season, matching the known El Niño calming effect.
+- The long-term trend is weak and easily swamped by year-to-year swings.
 
 ---
 

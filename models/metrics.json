@@ -1,43 +1,40 @@
 {
-  "XGBoost": {
-    "cv_r2": -0.2362,
-    "test_r2": 0.9284,
-    "rmse": 0.4288,
-    "mae": 0.3405,
-    "uses_scaler": false
+  "metrics": {
+    "Linear Regression": {
+      "cvR2": 0.1009,
+      "cvRmse": 1.4544,
+      "testR2": 0.6522,
+      "rmse": 0.9428,
+      "mae": 0.6667
+    },
+    "Ridge": {
+      "cvR2": 0.1327,
+      "cvRmse": 1.4247,
+      "testR2": 0.6522,
+      "rmse": 0.9428,
+      "mae": 0.6667
+    },
+    "Random Forest": {
+      "cvR2": 0.1592,
+      "cvRmse": 1.4104,
+      "testR2": 0.4565,
+      "rmse": 1.1785,
+      "mae": 0.8333
+    },
+    "Gradient Boosting": {
+      "cvR2": -0.0929,
+      "cvRmse": 1.5459,
+      "testR2": 0.3913,
+      "rmse": 1.2472,
+      "mae": 0.8889
+    }
   },
-  "Random Forest": {
-    "cv_r2": -0.0401,
-    "test_r2": 0.697,
-    "rmse": 0.882,
-    "mae": 0.702,
-    "uses_scaler": false
+  "baseline": {
+    "name": "Seasonal average",
+    "r2": 0.4348,
+    "rmse": 1.2019,
+    "mae": 0.8889
   },
-  "Gradient Boosting": {
-    "cv_r2": -0.2525,
-    "test_r2": 0.9532,
-    "rmse": 0.3467,
-    "mae": 0.2792,
-    "uses_scaler": false
-  },
-  "Linear Regression": {
-    "cv_r2": 0.0234,
-    "test_r2": 0.4393,
-    "rmse": 1.1999,
-    "mae": 0.9409,
-    "uses_scaler": true
-  },
-  "_best_model": "Linear Regression",
-  "_features": [
-    "Month",
-    "ONI",
-    "Nino3.4_SST_anomaly",
-    "Western_Pacific_SST",
-    "Vertical_Wind_Shear",
-    "Midlevel_Humidity",
-    "SeaLevelPressure",
-    "MJO_Phase",
-    "Prev_month_typhoons"
-  ],
-  "_target": "Number_of_Typhoons"
+  "bestModel": "Random Forest",
+  "dataThrough": "2026-06"
 }

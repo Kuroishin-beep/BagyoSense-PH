@@ -1,1 +1,17 @@
+# dependencies
 node_modules
+
+# next.js build output
+.next
+out
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# misc
+.DS_Store
+*.log
+.vercel
